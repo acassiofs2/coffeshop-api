@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: coffeshop
+  datasource:
+    url: jdbc:postgresql://localhost:5434/coffeshop
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
