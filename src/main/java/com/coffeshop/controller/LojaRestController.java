@@ -6,9 +6,11 @@ import com.coffeshop.dto.LojaResponseDTO;
 import com.coffeshop.service.LojaService;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +42,8 @@ public class LojaRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LojaResponseDTO>> listar() {
-        return ResponseEntity.ok(lojaService.listar());
+    public ResponseEntity<Page<LojaResponseDTO>> listar(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(lojaService.listar(pageable));
     }
 
     @GetMapping("/{id}")

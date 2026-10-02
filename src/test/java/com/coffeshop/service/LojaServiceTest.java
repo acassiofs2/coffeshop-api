@@ -25,6 +25,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -100,17 +104,20 @@ class LojaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve listar todas as lojas")
+    @DisplayName("Deve listar lojas de forma paginada")
     void deveListarLojas() {
-        when(lojaRepository.findAllByOrderByNomeAsc()).thenReturn(List.of(loja));
+        Pageable pageable = PageRequest.of(0, 20);
+        when(lojaRepository.findAllByOrderByNomeAsc(pageable))
+                .thenReturn(new PageImpl<>(List.of(loja), pageable, 1));
 
-        List<LojaResponseDTO> response = lojaService.listar();
+        Page<LojaResponseDTO> response = lojaService.listar(pageable);
 
-        assertThat(response).hasSize(1);
-        assertThat(response.getFirst().getId()).isEqualTo(lojaId);
-        assertThat(response.getFirst().getNome()).isEqualTo("Coffee Shop Centro");
-        assertThat(response.getFirst().getUsuarioId()).isEqualTo(usuarioId);
-        verify(lojaRepository).findAllByOrderByNomeAsc();
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getTotalElements()).isEqualTo(1);
+        assertThat(response.getContent().getFirst().getId()).isEqualTo(lojaId);
+        assertThat(response.getContent().getFirst().getNome()).isEqualTo("Coffee Shop Centro");
+        assertThat(response.getContent().getFirst().getUsuarioId()).isEqualTo(usuarioId);
+        verify(lojaRepository).findAllByOrderByNomeAsc(pageable);
     }
 
     @Test

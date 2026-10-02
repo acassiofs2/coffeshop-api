@@ -26,6 +26,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -97,14 +100,20 @@ class LojaRestControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/lojas deve retornar 200 OK")
+    @DisplayName("GET /api/lojas deve retornar 200 OK paginado")
     void deveListarLojas() throws Exception {
-        when(lojaService.listar()).thenReturn(List.of(response));
+        when(lojaService.listar(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1));
 
-        mockMvc.perform(get("/api/lojas"))
+        mockMvc.perform(get("/api/lojas")
+                        .param("page", "0")
+                        .param("size", "20"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(lojaId.toString()))
-                .andExpect(jsonPath("$[0].nome").value("Coffee Shop Centro"));
+                .andExpect(jsonPath("$.content[0].id").value(lojaId.toString()))
+                .andExpect(jsonPath("$.content[0].nome").value("Coffee Shop Centro"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.number").value(0));
     }
 
     @Test

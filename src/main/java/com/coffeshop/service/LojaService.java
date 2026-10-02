@@ -7,9 +7,10 @@ import com.coffeshop.entity.Loja;
 import com.coffeshop.entity.Usuario;
 import com.coffeshop.repository.LojaRepository;
 import com.coffeshop.repository.UsuarioRepository;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +36,9 @@ public class LojaService {
     }
 
     @Transactional(readOnly = true)
-    public List<LojaResponseDTO> listar() {
-        return lojaRepository.findAllByOrderByNomeAsc().stream()
-                .map(this::toResponseDTO)
-                .toList();
+    public Page<LojaResponseDTO> listar(Pageable pageable) {
+        return lojaRepository.findAllByOrderByNomeAsc(pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
